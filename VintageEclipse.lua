@@ -120,6 +120,13 @@ function RenderVintageEclipse()
       -17 * StinkiStorage.scale)
    VintageEclipse.AstralPowerBorder.texture:SetSize(140 * StinkiStorage.scale, 16 * StinkiStorage.scale)
    VintageEclipse.AstralPowerBorder.texture:SetTexture("Interface\\AddOns\\VintageEclipse\\textures\\AstralPowerBorder")
+
+   if StinkiStorage.hideAstralPower then 
+      VintageEclipse.AstralPowerStatusBar:SetAlpha(0)
+      VintageEclipse.AstralPowerValue:SetAlpha(0)
+      VintageEclipse.AstralPowerBackground:SetAlpha(0)
+      VintageEclipse.AstralPowerBorder:SetAlpha(0)
+   end
 end
 
 local function startEclipseCooldown(duration, eclipse)

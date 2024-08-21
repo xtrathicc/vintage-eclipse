@@ -2,7 +2,7 @@ local Storage = CreateFrame("Frame")
 
 SLASH_VintageEclipse1 = "/eclipse"
 SlashCmdList.VintageEclipse = function(msg, editBox)
-   local commandList = "/eclipse [scale/size] [number]\n /eclipse [reset]\n /eclipse [help]"
+   local commandList = "/eclipse [scale/size] [number]\n /eclipse [astral/astralpower] [show/hide]\n /eclipse [reset]\n /eclipse [help]"
 	local action, value = strsplit(" ", msg)
    if (action == "help")
    then
@@ -20,11 +20,24 @@ SlashCmdList.VintageEclipse = function(msg, editBox)
       StinkiStorage.point = "CENTER"
       StinkiStorage.xOfs = 0
       StinkiStorage.yOfs = 0
+      StinkiStorage.hideAstralPower = false
       ReloadUI()
+   elseif (action == "astral" or action == "astralpower")
+   then
+      if (value == "show") then
+         StinkiStorage.hideAstralPower = false
+         ReloadUI()
+      elseif (value == "hide") then
+         StinkiStorage.hideAstralPower = true
+         ReloadUI()
+      else
+         print(ChatPrefix, "forgot to add parameter show / hide")   
+      end
    else
 		print(ChatPrefix, "command unknown, see\n", commandList)
    end
 end
+
 
 local function AddonLoaded(self, event, addOnName)
 	if addOnName == "VintageEclipse" then
@@ -38,6 +51,7 @@ local function AddonLoaded(self, event, addOnName)
          then
             StinkiStorage.point = "CENTER"
          end
+         StinkiStorage.hideAstralPower = (StinkiStorage.hideAstralPower or false)
          
          local className, classFilename, classId = UnitClass("player");
          if classId == 11 and GetSpecialization() == 1 then
