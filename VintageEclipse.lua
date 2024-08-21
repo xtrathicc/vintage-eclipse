@@ -80,7 +80,7 @@ function RenderVintageEclipse()
    VintageEclipse.Cooldown:SetFrameLevel(9)
    VintageEclipse.Cooldown.text = VintageEclipse.Cooldown:CreateFontString(nil, "Overlay",
       "GameFontHighlight")
-   VintageEclipse.Cooldown.text:SetPoint("CENTER", VintageEclipse.MainFrame, "CENTER", 2, -2 * StinkiStorage
+   VintageEclipse.Cooldown.text:SetPoint("CENTER", VintageEclipse.MainFrame, "CENTER", 0, -2 * StinkiStorage
       .scale)
    VintageEclipse.Cooldown.text:SetFont("Fonts\\FRIZQT__.TTF", 13 * StinkiStorage.scale, "OUTLINE, MONOCHROME")
    VintageEclipse.Cooldown.text:SetJustifyH('CENTER')
