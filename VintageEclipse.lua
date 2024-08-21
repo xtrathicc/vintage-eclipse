@@ -1,4 +1,5 @@
 local VintageEclipse = CreateFrame("Frame")
+local auraInstanceID = nil
 
 function RenderVintageEclipse()
    VintageEclipse.MainFrame = CreateFrame("Frame", nil, UIParent)
@@ -75,13 +76,14 @@ function RenderVintageEclipse()
    VintageEclipse.LunarIconGlow.texture:SetTexture("Interface\\AddOns\\VintageEclipse\\textures\\LunarActiveOverlay")
    VintageEclipse.LunarIconGlow:SetAlpha(0)
 
-   VintageEclipse.Cooldown = CreateFrame("Cooldown", "VintageEclipse.Cooldown", VintageEclipse.MainFrame,
-      "CooldownFrameTemplate")
-   VintageEclipse.Cooldown:SetFrameLevel(10)
-   VintageEclipse.Cooldown:SetPoint("CENTER", VintageEclipse.MainFrame)
-   VintageEclipse.Cooldown:SetDrawBling(false)
-   VintageEclipse.Cooldown:SetDrawEdge(false)
-   VintageEclipse.Cooldown:SetDrawSwipe(false)
+   VintageEclipse.Cooldown = CreateFrame("Frame", nil, VintageEclipse.MainFrame)
+   VintageEclipse.Cooldown:SetFrameLevel(9)
+   VintageEclipse.Cooldown.text = VintageEclipse.Cooldown:CreateFontString(nil, "Overlay",
+      "GameFontHighlight")
+   VintageEclipse.Cooldown.text:SetPoint("CENTER", VintageEclipse.MainFrame, "CENTER", 2, -2 * StinkiStorage
+      .scale)
+   VintageEclipse.Cooldown.text:SetFont("Fonts\\FRIZQT__.TTF", 13 * StinkiStorage.scale, "OUTLINE, MONOCHROME")
+   VintageEclipse.Cooldown.text:SetJustifyH('CENTER')
 
    VintageEclipse.AstralPowerStatusBar = CreateFrame("StatusBar", nil, VintageEclipse.MainFrame)
    VintageEclipse.AstralPowerStatusBar:SetFrameLevel(1)
@@ -102,7 +104,6 @@ function RenderVintageEclipse()
       .scale)
    VintageEclipse.AstralPowerValue.text:SetText((UnitPower("player", 8) > 0) and UnitPower("player", 8) or "")
    VintageEclipse.AstralPowerValue.text:SetFont("Fonts\\FRIZQT__.TTF", 8 * StinkiStorage.scale, "OUTLINE, MONOCHROME")
-   --Mixin(EclipseAstralPowerBar,SmoothStatusBarMixin)
 
    VintageEclipse.AstralPowerBackground = CreateFrame("Frame", nil, VintageEclipse.MainFrame)
    VintageEclipse.AstralPowerBackground:SetFrameLevel(0)
@@ -129,40 +130,57 @@ function RenderVintageEclipse()
    end
 end
 
-local function startEclipseCooldown(duration, eclipse)
-   VintageEclipse.Cooldown:SetCooldown(GetTime(), duration)
-   VintageEclipse.Cooldown:SetScript("OnCooldownDone", function()
-      AnimationFadeOut(VintageEclipse.SolarIconGlow, 0.15)
-      AnimationFadeOut(VintageEclipse.SolarBarGlow, 0.15)
-      AnimationFadeOut(VintageEclipse.LunarIconGlow, 0.15)
-      AnimationFadeOut(VintageEclipse.LunarBarGlow, 0.15)
+local function startEclipseCooldown(duration, spellId)
+   VintageEclipse.Cooldown.text:SetText(duration)
+   local t = 0
+   local d = duration
+   VintageEclipse.Cooldown:SetScript("onUpdate", function(self, elapsed)
+      t = t + elapsed
+      if (t >= 1) then
+         t = 0
+         d = d - 1
+         VintageEclipse.Cooldown.text:SetText(d)
+      end
    end)
-   if eclipse == "solar" then
+   if spellId == 48517 then
       AnimationFadeIn(VintageEclipse.SolarIconGlow, 0.075)
       AnimationFadeIn(VintageEclipse.SolarBarGlow, 0.075)
    end
-   if eclipse == "lunar" then
+   if spellId == 48518 then
       AnimationFadeIn(VintageEclipse.LunarIconGlow, 0.075)
       AnimationFadeIn(VintageEclipse.LunarBarGlow, 0.075)
    end
 end
 
-
 local function UnitAura(self, event, unitTarget, updateInfo)
    if (updateInfo.addedAuras and unitTarget == "player") then
       for k, v in pairs(updateInfo.addedAuras) do
-         if (v.spellId == 48517) then -- solar
-            startEclipseCooldown(v.duration, "solar")
+         if (v.spellId == 48517) then
+            auraInstanceID = v.auraInstanceID
+            startEclipseCooldown(v.duration, v.spellId)
          end
-         if (v.spellId == 48518) then --lunar
-            startEclipseCooldown(v.duration, "lunar")
+         if (v.spellId == 48518) then
+            auraInstanceID = v.auraInstanceID
+            startEclipseCooldown(v.duration, v.spellId)
+         end
+      end
+   elseif (updateInfo.removedAuraInstanceIDs and unitTarget == "player") then
+      for k, v in pairs(updateInfo.removedAuraInstanceIDs) do
+         if (v == auraInstanceID) then
+            auraInstanceID = nil
+            VintageEclipse.Cooldown:SetScript("onUpdate", nil)
+            AnimationFadeOut(VintageEclipse.SolarIconGlow, 0.15)
+            AnimationFadeOut(VintageEclipse.SolarBarGlow, 0.15)
+            AnimationFadeOut(VintageEclipse.LunarIconGlow, 0.15)
+            AnimationFadeOut(VintageEclipse.LunarBarGlow, 0.15)
+            VintageEclipse.Cooldown.text:SetText("")
          end
       end
    end
 end
 
 local function UnitPowerUpdate(self, event, unitTarget, powerType)
-   if (unitTarget == "player" and powerType == "LUNAR_POWER") then
+   if (unitTarget == "player" and powerType == "LUNAR_POWER" and VintageEclipse.AstralPowerValue) then
       VintageEclipse.AstralPowerValue.text:SetText((UnitPower("player", 8) > 0) and UnitPower("player", 8) or "")
       VintageEclipse.AstralPowerStatusBar:SetValue(UnitPower("player", 8));
    end
