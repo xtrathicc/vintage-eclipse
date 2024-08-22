@@ -164,7 +164,8 @@ local function UnitAura(self, event, unitTarget, updateInfo)
             startEclipseCooldown(v.duration, v.spellId)
          end
       end
-   elseif (updateInfo.removedAuraInstanceIDs and unitTarget == "player") then
+   end
+   if (updateInfo.removedAuraInstanceIDs and unitTarget == "player") then
       for k, v in pairs(updateInfo.removedAuraInstanceIDs) do
          if (v == auraInstanceID) then
             auraInstanceID = nil

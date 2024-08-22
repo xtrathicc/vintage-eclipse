@@ -1,5 +1,5 @@
 ## Interface: 110002
-## Version: 1.1.0
+## Version: 1.1.1
 ## Title: |cfffeb144V|cfffeb144i|cfffeb144n|cfffeb144t|cfffeb144a|cfffeb144g|cfffeb144e |cff9ec1cfE|cff9ec1cfc|cff9ec1cfl|cff9ec1cfi|cff9ec1cfp|cff9ec1cfs|cff9ec1cfe
 ## IconTexture: Interface\AddOns\VintageEclipse\textures\VintageEclipseIconTransparent
 ## Notes: v11.0.2 | Simple UI to show Eclipse durations
